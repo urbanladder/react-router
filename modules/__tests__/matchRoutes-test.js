@@ -12,7 +12,7 @@ describe('matchRoutes', function () {
   let
     RootRoute, UsersRoute, UsersIndexRoute, UserRoute, PostRoute, FilesRoute,
     AboutRoute, TeamRoute, ProfileRoute, GreedyRoute, OptionalRoute,
-    OptionalRouteChild, CatchAllRoute
+    OptionalRouteChild, CatchAllRoute, StaticRoute
   let createLocation = createMemoryHistory().createLocation
 
   beforeEach(function () {
@@ -73,6 +73,27 @@ describe('matchRoutes', function () {
             path: 'child'
           }
         ]
+      },
+      StaticRoute = {
+        path: '(optional)',
+        matcher: (pathname) => {
+          // console.log(pathname)
+          let remainingPathname = pathname
+          let paramNames = []
+          let paramValues = []
+
+          if (pathname === '/hello' ) {
+            remainingPathname = ''
+            paramNames.push('permalink')
+            paramValues.push('hello-anshul')
+          }
+
+          return {
+            remainingPathname,
+            paramNames,
+            paramValues
+          }
+        }
       },
       CatchAllRoute = {
         path: '*'
@@ -161,6 +182,16 @@ describe('matchRoutes', function () {
         matchRoutes(routes, createLocation('/about'), function (error, match) {
           expect(match).toExist()
           expect(match.routes).toEqual([ AboutRoute ])
+          done()
+        })
+      })
+    })
+
+    describe('when the location matches a static route', function () {
+      it('matches the correct routes', function (done) {
+        matchRoutes(routes, createLocation('/hello'), function (error, match) {
+          expect(match).toExist()
+          expect(match.routes).toEqual([ StaticRoute ])
           done()
         })
       })

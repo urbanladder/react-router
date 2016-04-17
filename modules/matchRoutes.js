@@ -87,8 +87,13 @@ function matchRouteDeep(
 
   // Only try to match the path if the route actually has a pattern, and if
   // we're not just searching for potential nested absolute paths.
-  if (remainingPathname !== null && pattern) {
-    const matched = matchPattern(pattern, remainingPathname)
+  if (remainingPathname !== null && (pattern || route.matcher)) {
+    let matched
+    if (typeof route.matcher === 'function') {
+      matched = route.matcher(remainingPathname)
+    } else {
+      matched = matchPattern(pattern, remainingPathname)
+    }
     remainingPathname = matched.remainingPathname
     paramNames = [ ...paramNames, ...matched.paramNames ]
     paramValues = [ ...paramValues, ...matched.paramValues ]
